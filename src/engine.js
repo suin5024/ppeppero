@@ -23,18 +23,26 @@ window.GameEngine = (function() {
   function playClick() {}
   function playUnlockSound() {}
 
-  // 16:9 반응형 스케일러 (화면 중앙 기준 자동 축소/확대)
+  // 16:9 반응형 스케일러 (모바일/PC 정밀 오프셋 중앙 밀착 정렬)
   function handleResize() {
     const viewport = document.getElementById('game-viewport');
     if (!viewport) return;
 
     const baseWidth = 1920;
     const baseHeight = 1080;
-    const winWidth = window.innerWidth || document.documentElement.clientWidth || screen.width || 1920;
-    const winHeight = window.innerHeight || document.documentElement.clientHeight || screen.height || 1080;
+    
+    // 모바일 브라우저 주소창 및 뷰포트 고려한 실질 표시 너비/높이
+    const winWidth = document.documentElement.clientWidth || window.innerWidth;
+    const winHeight = document.documentElement.clientHeight || window.innerHeight;
 
     const scale = Math.min(winWidth / baseWidth, winHeight / baseHeight);
-    viewport.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    const scaledWidth = baseWidth * scale;
+    const scaledHeight = baseHeight * scale;
+
+    const left = (winWidth - scaledWidth) / 2;
+    const top = (winHeight - scaledHeight) / 2;
+
+    viewport.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
   }
 
   // 로컬 세이브/로드 (모바일 시크릿 모드/웹뷰 예외 방지)

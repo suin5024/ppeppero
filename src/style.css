@@ -25,62 +25,30 @@ input[type="text"], input[type="password"], textarea {
 }
 
 body, html {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
   background-color: #0b0c10;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   color: #f1f2f6;
+  margin: 0;
+  padding: 0;
 }
 
-/* 16:9 고정 뷰포트 컨테이너 (모바일 및 PC 정중앙 밀착 정렬) */
+/* 16:9 고정 뷰포트 컨테이너 (좌상단 기준 정밀 픽셀 스케일러) */
 #game-viewport {
   width: 1920px;
   height: 1080px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(1);
-  transform-origin: center center;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
   overflow: hidden;
   background-color: #121522;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-}
-
-/* 모바일 세로 모드 가로 회전 안내 배너 */
-#rotate-notice {
-  display: none;
-  position: fixed;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  background: rgba(255, 82, 119, 0.92);
-  color: #ffffff;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  cursor: pointer;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-  animation: pulseRotate 2.2s infinite ease-in-out;
-}
-
-@keyframes pulseRotate {
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.03); }
-}
-
-/* 화면이 세로로 길 때(모바일 세로 모드) 회전 배너 표시 */
-@media screen and (max-aspect-ratio: 13/9) and (max-width: 900px) {
-  #rotate-notice {
-    display: flex;
-  }
 }
 
 /* 화면 스위칭 */
