@@ -23,34 +23,40 @@ window.GameEngine = (function() {
   function playClick() {}
   function playUnlockSound() {}
 
-  // 16:9 반응형 스케일러
+  // 16:9 반응형 스케일러 (화면 중앙 기준 자동 축소/확대)
   function handleResize() {
     const viewport = document.getElementById('game-viewport');
     if (!viewport) return;
 
     const baseWidth = 1920;
     const baseHeight = 1080;
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
+    const winWidth = window.innerWidth || document.documentElement.clientWidth || screen.width || 1920;
+    const winHeight = window.innerHeight || document.documentElement.clientHeight || screen.height || 1080;
 
     const scale = Math.min(winWidth / baseWidth, winHeight / baseHeight);
-    viewport.style.transform = `scale(${scale})`;
-    viewport.style.left = `${(winWidth - baseWidth * scale) / 2}px`;
-    viewport.style.top = `${(winHeight - baseHeight * scale) / 2}px`;
+    viewport.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
-  // 로컬 세이브/로드
+  // 로컬 세이브/로드 (모바일 시크릿 모드/웹뷰 예외 방지)
   function loadProgress() {
-    const saved = localStorage.getItem('ppeppero_unlocked_stage');
-    if (saved) {
-      state.unlockedStage = Math.max(1, parseInt(saved, 10));
+    try {
+      const saved = localStorage.getItem('ppeppero_unlocked_stage');
+      if (saved) {
+        state.unlockedStage = Math.max(1, parseInt(saved, 10));
+      }
+    } catch (e) {
+      console.warn('LocalStorage access blocked:', e);
     }
   }
 
   function saveProgress(stage) {
     if (stage > state.unlockedStage) {
       state.unlockedStage = stage;
-      localStorage.setItem('ppeppero_unlocked_stage', stage.toString());
+      try {
+        localStorage.setItem('ppeppero_unlocked_stage', stage.toString());
+      } catch (e) {
+        console.warn('LocalStorage save blocked:', e);
+      }
     }
   }
 
@@ -711,6 +717,11 @@ window.GameEngine = (function() {
   function init() {
     loadProgress();
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(handleResize, 100);
+      setTimeout(handleResize, 300);
+    });
+    window.addEventListener('load', handleResize);
     handleResize();
 
     // 키보드 이벤트 (스페이스, 엔터로 대사 넘기기 / 좌측 화살표로 이전 대사)
@@ -821,6 +832,7 @@ window.GameEngine = (function() {
 
   return {
     init,
+    handleResize,
     startStage,
     openStageSelect,
     showScreen,
@@ -834,7 +846,12 @@ window.GameEngine = (function() {
   };
 })();
 
-window.addEventListener('DOMContentLoaded', () => {
+// 모바일 브라우저 및 DOMContentLoaded 타이밍 이슈 방지
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    window.GameEngine.init();
+  });
+} else {
   window.GameEngine.init();
-});
+}
 
