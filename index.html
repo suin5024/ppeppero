@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>이상한 빼빼로데이</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+
+  <!-- 16:9 고정 게임 뷰포트 (1920 x 1080) -->
+  <div id="game-viewport">
+
+    <!-- 1. 타이틀 화면 (게임 시작 버튼만 단독 표시) -->
+    <div id="screen-title" class="screen active" style="background-image: url('assets/ui/title_bg.png');">
+      <div class="title-controls">
+        <button class="title-btn start-btn" onclick="GameEngine.openStageSelect()">게임 시작</button>
+      </div>
+    </div>
+
+    <!-- 2. 스테이지 선택 화면 (글래스모피즘) -->
+    <div id="screen-stage-select" class="screen" style="background-image: url('assets/ui/title_bg.png');">
+      <div class="glass-modal">
+        <div class="stage-select-header">
+          <h2>STAGE SELECT</h2>
+          <button class="glass-btn" onclick="GameEngine.showScreen('screen-title')">타이틀로 돌아가기</button>
+        </div>
+        <div id="stage-cards-grid" class="stage-cards-grid">
+          <!-- 동적 생성 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 인게임 메인 화면 -->
+    <div id="screen-game" class="screen">
+      <!-- 상단 네비게이션 미니 바 -->
+      <div class="in-game-top-bar">
+        <button class="mini-nav-btn" onclick="GameEngine.openDialogueLog()">대사보기</button>
+        <button class="mini-nav-btn" onclick="GameEngine.returnToTitle()">타이틀로</button>
+      </div>
+
+      <!-- 배경 레이어 및 페이드 오버레이 -->
+      <div id="bg-layer"></div>
+      <div id="bg-fade-overlay"></div>
+
+      <!-- 전체화면 이벤트 CG 레이어 (크로스페이드 듀얼 슬롯) -->
+      <div id="cg-layer" onclick="GameEngine.handleDialogueAdvance()">
+        <div id="cg-img-1" class="cg-sub-layer"></div>
+        <div id="cg-img-2" class="cg-sub-layer"></div>
+      </div>
+
+      <!-- 캐릭터 스탠딩 레이어 -->
+      <div id="char-layer">
+        <img id="char-sprite" src="" alt="캐릭터" />
+      </div>
+
+      <!-- 소품 팝업 레이어 -->
+      <div id="popup-layer" onclick="GameEngine.handleDialogueAdvance()">
+        <img id="popup-img" src="" alt="소품" />
+      </div>
+
+      <!-- 대화창 레이어 (상단 분리된 이름 공간 + 하단 대사 영역) -->
+      <div id="dialogue-layer">
+        <div id="speaker-tag-box" class="hidden">
+          <span id="speaker-name">성해빈</span>
+        </div>
+        <div id="dialogue-box" onclick="GameEngine.handleDialogueAdvance()">
+          <!-- 대사창 내부 좌측 이전 대사 삼각형 아이콘 버튼 -->
+          <button id="prev-dialogue-btn" class="dialogue-side-btn" onclick="event.stopPropagation(); GameEngine.goToPreviousDialogue()" title="이전 대사">◀</button>
+          <div id="dialogue-text">대사가 이곳에 출력됩니다.</div>
+          <div id="next-indicator">▼</div>
+        </div>
+      </div>
+
+      <!-- 퍼즐 팝업 모달 (기존 배경 위에 팝업창으로 뜸) -->
+      <div id="puzzle-screen-container" class="puzzle-modal-overlay">
+        <div class="puzzle-modal-window">
+          <!-- 1. 팝업창 상단 헤더: 우측 닫기 버튼만 미니멀하게 배치 -->
+          <div class="puzzle-modal-header">
+            <button class="puzzle-close-btn" onclick="GameEngine.closePuzzleToDialogue()" title="대화로 돌아가기">✕</button>
+          </div>
+          <!-- 2. 팝업창 내부 문제 이미지 -->
+          <div class="puzzle-img-container">
+            <img id="puzzle-bg-img" src="" alt="퍼즐 문제" />
+          </div>
+          <!-- 3. 이미지 아래 설명 글 -->
+          <div class="puzzle-desc-wrapper">
+            <div id="puzzle-title-text" class="puzzle-desc-text"></div>
+          </div>
+          <!-- 4. 설명 글 아래 답 입력 영역 -->
+          <div id="puzzle-interactive-ui">
+            <!-- puzzles.js에서 동적 렌더링 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 영화 엔딩 스타일 중앙 네온 대사 연출 레이어 -->
+      <div id="cinematic-quote-layer" onclick="GameEngine.handleDialogueAdvance()">
+        <div id="cinematic-quote-text"></div>
+      </div>
+
+      <!-- 엔딩 화면: 전체 암전 -> THE END 페이드인 -> 타이틀로 버튼 순차 출현 -->
+      <div id="ending-overlay">
+        <div class="ending-cinematic-content">
+          <div class="ending-title-neon">THE END</div>
+          <button class="ending-cinematic-btn" onclick="GameEngine.returnToTitle()">타이틀로</button>
+        </div>
+      </div>
+      <!-- 대사보기 채팅방 모달 (4:5 비율) -->
+      <div id="dialogue-log-modal" class="log-modal-overlay" onclick="GameEngine.closeDialogueLog()">
+        <div class="log-modal-window" onclick="event.stopPropagation()">
+          <div class="log-modal-header">
+            <h3>대사 기록</h3>
+            <button class="log-close-btn" onclick="GameEngine.closeDialogueLog()">✕</button>
+          </div>
+          <div id="log-messages-container" class="log-messages-container">
+            <!-- 동적 채팅 목록 생성 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 스크립트 로드 -->
+  <script src="src/script.js"></script>
+  <script src="src/puzzles.js"></script>
+  <script src="src/engine.js"></script>
+</body>
+</html>
+
