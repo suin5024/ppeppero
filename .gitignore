@@ -22,4 +22,5 @@ pnpm-debug.log*
 # Local temp & memo folder (깃허브 업로드 제외)
 temp/
 memo/
+docs/
 
