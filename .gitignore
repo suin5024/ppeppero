@@ -19,3 +19,7 @@ pnpm-debug.log*
 *.swp
 *.swo
 
+# Local temp & memo folder (깃허브 업로드 제외)
+temp/
+memo/
+
